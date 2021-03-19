@@ -2,47 +2,36 @@
 import React, { Component } from 'react';
 import {Container, ListGroup, ListGroupItem, Button} from 'reactstrap';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
-import {v4 as uuid} from 'uuid';
+import PropTypes from 'prop-types';
+
+// Redux imports
+import { connect } from 'react-redux';
+import { getItems, deleteItem, addItem } from '../actions/itemActions';
+
 
 class TodoList extends Component{
-    state = {
-        items: [
-            { id: uuid(), name: 'Walk'},
-            { id: uuid(), name: 'Eat'},
-            { id: uuid(), name: 'Shower'},
-            { id: uuid(), name: 'Sleep'}
-        ],
 
+    // Lifecycle method
+    componentDidMount(){
+        // Calls getItems as soon as this component is mounted to the render tree
+        this.props.getItems();
+    }
+
+    // Callback for when delete button us pressed on an object
+    onDeleteClick(id){
+        // When clicked, set the state by deleting (fitering) any item in the item array that matches the current item's id
+         this.setState(
+            this.props.deleteItem(id)
+        );
     }
 
     render(){
         // Get items from TodoList state variable (De-Strucutres item by taking only the first argument [titled `items` in this case])
-        const { items } = this.state;
+        const { items } = this.props.item;
 
         // Return markup
         return (
             <Container>
-
-                {/* Button to add TodoList items */}
-                <Button 
-                // Inline react styling
-                color='dark'
-                style={{marginBottom:'2rem'}}
-
-                // OnClick function to change state
-                onClick={()=>{
-                    // Prompt user for new task name
-                    const name = prompt('Enter a new Todo');
-
-                    if(name){
-                        // Set state by copying all previous items and adding newly created item with infro from prompt
-                        this.setState(state => ({
-                            items: [...state.items, {id: uuid(), name}]
-                        }));
-                    }
-                }}
-                >Add Todo</Button>
-
                 {/* Markup for displaying existing TodoList items */}
                 <ListGroup>
                     <TransitionGroup className='todo-list'>
@@ -55,10 +44,7 @@ class TodoList extends Component{
                                             className='remove-btn'
                                             color='danger'
                                             size='small'
-                                            onClick={()=>{
-                                                {/* When clicked, set the state by deleting (fitering) any item in the item array that matches the current item's id */}
-                                                this.setState(state => ({items: state.items.filter(item => item.id != id)}));
-                                            }}
+                                            onClick={this.onDeleteClick.bind(this, id)}
                                          >&times;</Button>
                                         {name}
                                     </ListGroupItem>
@@ -74,4 +60,16 @@ class TodoList extends Component{
     }
 }
 
-export default TodoList;
+TodoList.propTypes = {
+    deleteItem: PropTypes.func.isRequired, 
+    getItems: PropTypes.func.isRequired,
+    item: PropTypes.object.isRequired
+}
+
+const mapStateToProps = (state) => ({
+    item: state.item
+});
+
+
+// Makes this component accessible to external file and connect actions from itemActions file so that they are usable here
+export default connect(mapStateToProps, { getItems, deleteItem })(TodoList);
