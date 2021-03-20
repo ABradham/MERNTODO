@@ -1,28 +1,50 @@
-// This is a file that specifies / define what actions that apply to todo-list items we can take
+// This is a file that creates Actions and ActionCreators for Redux
 
 // Document Imports
-import {GET_ITEMS, ADD_ITEM, DELETE_ITEM} from './types';
+import {GET_ITEMS, ADD_ITEM, DELETE_ITEM, ITEMS_LOADING} from './types';
+import axios from 'axios';
 
-export const getItems = () => {
+export const getItems = () => dispatch => {
+    // Set loading field in item reducer state to be true
+    dispatch(setItemsLoading());
+
+    // Make GET request to API and dispatch change to our reducer
+    axios
+    .get('/api/items')
+    .then(res => 
+        dispatch({type: GET_ITEMS, payload: res.data}));
+
     // Return to itemReducer the type of "GET_ITEMS"
     return {
         type: GET_ITEMS
     }
 }
 
-export const deleteItem = (id) => {
+export const deleteItem = (id) => dispatch => {
     // Return to itemReducer the type of "DELETE_ITEMS" with a payload of the id of the item we want to delete
-    return {
-        type: DELETE_ITEM,
-        payload: id
-    }
+    axios
+    .delete(`api/items/${id}`)
+    .then(res => dispatch(
+        {
+            type: DELETE_ITEM,
+            payload: id
+        }
+    ));
 }
 
 
-export const addItem = item => {
-    // Return to itemReducer the type of "ADD_ITEMS" with a payload of the item object we want to create
+export const addItem = (item) => dispatch => {
+
+    // Make POST request to API
+    axios
+    .post('/api/items', item)
+    .then(res =>  
+        dispatch({type: ADD_ITEM, payload: res.data}));
+}
+
+export const setItemsLoading = () => {
+    // Return to itemReducer the type of "ITEMS_LOADING" to set item state object to have a `loading` attribute of true
     return {
-        type: ADD_ITEM,
-        payload: item
+        type: ITEMS_LOADING
     }
 }

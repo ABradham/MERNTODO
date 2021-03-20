@@ -1,33 +1,37 @@
 // Document imports
 import {v4 as uuid} from 'uuid';
-import {GET_ITEMS, ADD_ITEM, DELETE_ITEM} from '../actions/types';
+import {GET_ITEMS, ADD_ITEM, DELETE_ITEM, ITEMS_LOADING} from '../actions/types';
 
 
+// Initial state in the item reducer
 const initialState = {
-    items: [
-        { id: uuid(), name: 'Walk'},
-        { id: uuid(), name: 'Eat'},
-        { id: uuid(), name: 'Shower'},
-        { id: uuid(), name: 'Sleep'}
-    ],
+    items: [],
+    loading: false
 }
 
-export default function(state = initialState, action){
+export default function(state = initialState /*defines inintial itemReducer store data, otherwise passes in what's already there*/, action){
     switch(action.type){
         case GET_ITEMS:
             return {
-                ...state
+                ...state,
+                items: action.payload,
+                loading: false // set loading to false because at this point we will have recived a response
             };
         case DELETE_ITEM:
             return {
                 ...state,
-                items: state.items.filter(item => item.id !== action.payload)
+                items: state.items.filter(item => item._id !== action.payload)
             };
         case ADD_ITEM:
             return {
                 ...state,
                 items: [action.payload, ...state.items]
-            }
+            };
+        case ITEMS_LOADING:
+            return {
+                ...state,
+                loading: true
+            };
         default:
             return state;
     }

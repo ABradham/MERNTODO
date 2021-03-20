@@ -37,14 +37,14 @@ class TodoList extends Component{
                     <TransitionGroup className='todo-list'>
                         {/* Loop through items array and create a new ListGroupItem for each element in the array */}
                         {items.map(
-                            ({ id, name }) => (
-                                <CSSTransition key={id} timeout={500} classNames='fade'>
+                            ({ _id, name }) => (
+                                <CSSTransition key={_id} timeout={500} classNames='fade'>
                                     <ListGroupItem>
                                         <Button 
                                             className='remove-btn'
                                             color='danger'
                                             size='small'
-                                            onClick={this.onDeleteClick.bind(this, id)}
+                                            onClick={this.onDeleteClick.bind(this, _id)}
                                          >&times;</Button>
                                         {name}
                                     </ListGroupItem>
